@@ -1,5 +1,6 @@
 from typing import Union
 from fastapi import FastAPI, File, UploadFile, HTTPException, Form
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from langchain_ollama import ChatOllama
@@ -15,6 +16,13 @@ import os
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class Question(BaseModel):
     question: str
@@ -44,6 +52,7 @@ def stream_response(response):
     for line in response:
         yield line
 
+pdf_name = None
 
 # Endpoint para subir PDF
 @app.post("/upload_pdf")
@@ -101,8 +110,10 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     # Eliminar el archivo PDF temporal
     shutil.rmtree(temp_dir)
-    # Retornar mensaje de éxito y el nombre del archivo
-    return {"PDF procesado y datos persistidos exitosamente", "nombre: " + file.filename}
+    # Retornar mensaje de éxito y el nombre del archivo en formato JSON
+    global pdf_name 
+    pdf_name = file.filename
+    return {"filename": file.filename}
 
 # Endpoint para hacer preguntas basadas en el PDF subido
 @app.post("/ask_question/")
@@ -119,3 +130,9 @@ async def ask_question(question: Question):
         raise HTTPException(status_code=400, detail="No se ha cargado ningún PDF")
     response = qa.stream({"query": question})
     return StreamingResponse(stream_response(response), media_type="application/json")
+
+@app.get("/get_pdf_name")
+async def get_pdf_name():
+    if pdf_name is None:
+        raise HTTPException(status_code=400, detail="No se ha cargado ningún PDF")
+    return {"filename": pdf_name}

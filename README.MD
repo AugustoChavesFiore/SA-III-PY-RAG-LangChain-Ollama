@@ -56,6 +56,9 @@ Para hacer una pregunta sobre el contenido del PDF subido, realiza una solicitud
     }
 ```
 
+## Preguntar si un archivo PDF ha sido subido
+Para preguntar si un archivo PDF ha sido subido, realiza una solicitud GET al endpoint /get_pdf_name.
+
 ## Archivos Clave
 * app/main.py: Contiene la lógica principal de la aplicación FastAPI.
 * requirements.txt: Lista de dependencias de Python necesarias para la aplicación.
