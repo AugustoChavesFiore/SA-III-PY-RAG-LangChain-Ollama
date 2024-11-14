@@ -47,7 +47,7 @@ Para subir un archivo PDF, realiza una solicitud POST al endpoint /upload_pdf co
 ```
 
 
-##Hacer una Pregunta
+## Hacer una Pregunta
 Para hacer una pregunta sobre el contenido del PDF subido, realiza una solicitud POST al endpoint /ask_question con la pregunta en el cuerpo de la solicitud.
 
 ```json
